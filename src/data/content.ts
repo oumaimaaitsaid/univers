@@ -162,7 +162,7 @@ export const SITE_DATA: Record<Language, SiteData> = {
       label: 'L’ASSOCIATION',
       title: 'Une initiative citoyenne ancrée à Asfi',
       paragraph1:
-        'Fondée en [À REMPLACER: année de création] à Asfi, Univers Anim est une association à but non lucratif née de la volonté d’animer la vie culturelle locale et de proposer des activités régulières aux enfants et aux jeunes.',
+        'Fondée en 2019 à Asfi, Univers Anim est une association à but non lucratif née de la volonté d’animer la vie culturelle locale et de proposer des activités régulières aux enfants et aux jeunes.',
       paragraph2:
         'Nos membres bénévoles organisent des ateliers de théâtre, des répétitions musicales, des sorties éducatives et participent aux événements de la ville. Nous croyons à l’action concrète de terrain et à la solidarité entre générations.',
       infoPill: 'Statut : Association déclarée à Asfi · Région Marrakech-Safi',
@@ -317,7 +317,7 @@ export const SITE_DATA: Record<Language, SiteData> = {
       label: 'التعريف بالجمعية',
       title: 'مبادرة مدنية راسخة في مدينة أسفي',
       paragraph1:
-        'تأسست جمعية "يونيفر أنيم" سنة [À REMPLACER: سنة التأسيس] بأسفي، وهي جمعية غير ربحية تهدف إلى تنشيط الحياة الثقافية وتوفير فضاءات للتعبير والتكوين لفائدة الأطفال والشباب.',
+        'تأسست جمعية "يونيفر أنيم" سنة 2019 بأسفي، وهي جمعية غير ربحية تهدف إلى تنشيط الحياة الثقافية وتوفير فضاءات للتعبير والتكوين لفائدة الأطفال والشباب.',
       paragraph2:
         'يؤطر المتطوعون ورشات منتظمة في الفنون المسرحية والموسيقية والأنشطة الإبداعية. نعتمد على العمل الميداني البسيط والصادق لخدمة مجتمعنا المحلي.',
       infoPill: 'الصفة : جمعية مصرح بها بأسفي · جهة مراكش-أسفي',

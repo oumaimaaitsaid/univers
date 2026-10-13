@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Pause, Play, Volume2, VolumeX } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Language } from '../types';
 import { SITE_DATA } from '../data/content';
-import { PhotoFrame } from './PhotoFrame';
 import { MagneticButton } from './MagneticButton';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -22,6 +22,27 @@ export const Hero: React.FC<HeroProps> = ({ currentLang }) => {
   const introRef = useRef<HTMLParagraphElement>(null);
   const buttonsRef = useRef<HTMLDivElement>(null);
   const photoColRef = useRef<HTMLDivElement>(null);
+  const photoCardRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const mp4SourceRef = useRef<HTMLSourceElement>(null);
+  const webmSourceRef = useRef<HTMLSourceElement>(null);
+  const fadeFrameRef = useRef<number | null>(null);
+  const sourceLoadedRef = useRef(false);
+  const shouldPlayRef = useRef(false);
+  const userPausedRef = useRef(false);
+  const isIntersectingRef = useRef(false);
+  const isPageVisibleRef = useRef(true);
+  const soundEnabledRef = useRef(false);
+  const loadVideoRef = useRef<() => void>(() => undefined);
+  const startPlaybackRef = useRef<() => void>(() => undefined);
+  const fadeVolumeRef = useRef<(target: number, muteWhenDone?: boolean, onDone?: () => void) => void>(
+    () => undefined
+  );
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const [isVideoRestricted, setIsVideoRestricted] = useState(false);
+  const [isVideoError, setIsVideoError] = useState(false);
+  const [isSoundEnabled, setIsSoundEnabled] = useState(false);
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -98,6 +119,250 @@ export const Hero: React.FC<HeroProps> = ({ currentLang }) => {
 
     return () => ctx.revert();
   }, [currentLang]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    const mp4Source = mp4SourceRef.current;
+    const webmSource = webmSourceRef.current;
+    const section = sectionRef.current;
+    if (!video || !mp4Source || !webmSource || !section) return;
+    video.volume = 0;
+    video.muted = true;
+
+    const fadeVolume = (
+      target: number,
+      muteWhenDone = false,
+      onDone?: () => void
+    ) => {
+      if (fadeFrameRef.current !== null) {
+        window.cancelAnimationFrame(fadeFrameRef.current);
+      }
+
+      video.muted = false;
+      const startVolume = video.volume;
+      const startedAt = performance.now();
+      const duration = target > startVolume ? 450 : 250;
+
+      const step = (now: number) => {
+        const progress = Math.min((now - startedAt) / duration, 1);
+        video.volume = startVolume + (target - startVolume) * progress;
+
+        if (progress < 1) {
+          fadeFrameRef.current = window.requestAnimationFrame(step);
+          return;
+        }
+
+        fadeFrameRef.current = null;
+        if (muteWhenDone) video.muted = true;
+        onDone?.();
+      };
+
+      fadeFrameRef.current = window.requestAnimationFrame(step);
+    };
+
+    const startPlayback = () => {
+      if (!sourceLoadedRef.current || !isIntersectingRef.current || !isPageVisibleRef.current) return;
+      if (video.readyState < HTMLMediaElement.HAVE_FUTURE_DATA) return;
+
+      video.muted = !soundEnabledRef.current;
+      void video.play().then(() => {
+        if (soundEnabledRef.current && video.volume < 1) fadeVolume(1);
+      }).catch(() => {
+        setIsPlaying(false);
+      });
+    };
+
+    const loadVideo = () => {
+      if (sourceLoadedRef.current) return;
+
+      sourceLoadedRef.current = true;
+      video.preload = 'metadata';
+      mp4Source.src = '/videos/hero.mp4';
+      webmSource.src = '/videos/hero.webm';
+      setIsVideoLoaded(true);
+      video.load();
+    };
+
+    const pauseWhenHidden = () => {
+      fadeVolume(0, true, () => video.pause());
+    };
+
+    const isRestricted = () => {
+      const connection = (navigator as Navigator & {
+        connection?: { saveData?: boolean; effectiveType?: string };
+      }).connection;
+      const slowConnection = connection?.saveData === true ||
+        connection?.effectiveType === 'slow-2g' ||
+        connection?.effectiveType === '2g' ||
+        connection?.effectiveType === '3g';
+
+      return window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+        Boolean(slowConnection);
+    };
+
+    const updatePlaybackPolicy = () => {
+      const restricted = isRestricted();
+      setIsVideoRestricted(restricted);
+
+      if (restricted) {
+        shouldPlayRef.current = false;
+        if (!video.paused) pauseWhenHidden();
+        return;
+      }
+
+      if (!userPausedRef.current) shouldPlayRef.current = true;
+      if (sourceLoadedRef.current && shouldPlayRef.current) startPlayback();
+    };
+
+    fadeVolumeRef.current = fadeVolume;
+    loadVideoRef.current = loadVideo;
+    startPlaybackRef.current = startPlayback;
+
+    const idleWindow = window as Window & {
+      requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    let idleCallbackId: number | null = null;
+    let idleTimeoutId: number | null = null;
+    const scheduleVideoLoad = () => {
+      if (isRestricted()) return;
+      if (idleWindow.requestIdleCallback) {
+        idleCallbackId = idleWindow.requestIdleCallback(loadVideo, { timeout: 2500 });
+      } else {
+        idleTimeoutId = window.setTimeout(loadVideo, 1200);
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isIntersectingRef.current = entry.isIntersecting;
+        if (!entry.isIntersecting) {
+          if (!video.paused) pauseWhenHidden();
+          return;
+        }
+
+        if (shouldPlayRef.current && isPageVisibleRef.current) {
+          if (!sourceLoadedRef.current && !isRestricted()) loadVideo();
+          else startPlayback();
+        }
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(section);
+
+    const handleVisibilityChange = () => {
+      isPageVisibleRef.current = !document.hidden;
+      if (!isPageVisibleRef.current) {
+        if (!video.paused) pauseWhenHidden();
+      } else if (isIntersectingRef.current && shouldPlayRef.current) {
+        startPlayback();
+      }
+    };
+
+    const handleCanPlay = () => {
+      if (shouldPlayRef.current && isIntersectingRef.current && isPageVisibleRef.current) {
+        startPlayback();
+      }
+    };
+
+    const handleVideoError = () => {
+      setIsVideoError(true);
+      setIsPlaying(false);
+    };
+
+    const connection = (navigator as Navigator & { connection?: EventTarget }).connection;
+    const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    video.addEventListener('canplay', handleCanPlay);
+    video.addEventListener('error', handleVideoError);
+    window.addEventListener('resize', updatePlaybackPolicy);
+    reducedMotionQuery.addEventListener('change', updatePlaybackPolicy);
+    connection?.addEventListener('change', updatePlaybackPolicy);
+
+    updatePlaybackPolicy();
+    scheduleVideoLoad();
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      video.removeEventListener('canplay', handleCanPlay);
+      video.removeEventListener('error', handleVideoError);
+      window.removeEventListener('resize', updatePlaybackPolicy);
+      reducedMotionQuery.removeEventListener('change', updatePlaybackPolicy);
+      connection?.removeEventListener('change', updatePlaybackPolicy);
+      if (idleCallbackId !== null) idleWindow.cancelIdleCallback?.(idleCallbackId);
+      if (idleTimeoutId !== null) window.clearTimeout(idleTimeoutId);
+      if (fadeFrameRef.current !== null) window.cancelAnimationFrame(fadeFrameRef.current);
+      fadeVolumeRef.current = () => undefined;
+      loadVideoRef.current = () => undefined;
+      startPlaybackRef.current = () => undefined;
+      video.pause();
+    };
+  }, []);
+
+  const handleTogglePlayback = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (shouldPlayRef.current) {
+      shouldPlayRef.current = false;
+      userPausedRef.current = true;
+      fadeVolumeRef.current(0, true, () => video.pause());
+      return;
+    }
+
+    shouldPlayRef.current = true;
+    userPausedRef.current = false;
+    if (!sourceLoadedRef.current) loadVideoRef.current();
+    startPlaybackRef.current();
+  };
+
+  const handleToggleSound = () => {
+    const enableSound = !soundEnabledRef.current;
+    soundEnabledRef.current = enableSound;
+    setIsSoundEnabled(enableSound);
+
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (enableSound) {
+      video.muted = false;
+      if (!video.paused) fadeVolumeRef.current(1);
+    } else {
+      fadeVolumeRef.current(0, true);
+    }
+  };
+
+  const handlePhotoMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!photoCardRef.current) return;
+    const bounds = photoCardRef.current.getBoundingClientRect();
+    const rotateX = ((event.clientY - bounds.top - bounds.height / 2) / (bounds.height / 2)) * -5;
+    const rotateY = ((event.clientX - bounds.left - bounds.width / 2) / (bounds.width / 2)) * 5;
+
+    gsap.to(photoCardRef.current, {
+      rotateX,
+      rotateY,
+      transformPerspective: 900,
+      duration: 0.3,
+      ease: 'power2.out',
+    });
+  };
+
+  const handlePhotoMouseLeave = () => {
+    if (!photoCardRef.current) return;
+    gsap.to(photoCardRef.current, {
+      rotateX: 0,
+      rotateY: 0,
+      duration: 0.5,
+      ease: 'power2.out',
+    });
+  };
+
+  const isArabic = currentLang === 'ar';
+  const playLabel = isArabic ? 'تشغيل الفيديو' : 'Lire la vidéo';
+  const soundLabel = isSoundEnabled
+    ? isArabic ? 'كتم الصوت' : 'Couper le son'
+    : isArabic ? 'تشغيل الصوت' : 'Activer le son';
 
   return (
     <section
@@ -189,21 +454,104 @@ export const Hero: React.FC<HeroProps> = ({ currentLang }) => {
           {/* Column 2: Large Framed Photo Placeholder with subtle tilt & parallax */}
           <div ref={photoColRef} className="lg:col-span-5 flex justify-center will-change-transform">
             <div className="w-full max-w-md">
-              <PhotoFrame
-                src="/images/hero.jpg"
-                formatLabel="PHOTO À AJOUTER (format 4:3)"
-                fileNameNotice="[Déposer: /images/hero.jpg]"
-                aspectRatio="aspect-[4/3]"
-                hasOffsetNavy={true}
-                hasGoldBorder={true}
-                rotation="-rotate-1 hover:rotate-0"
-                enableTilt={true}
-                caption={
-                  currentLang === 'ar'
+              <div
+                ref={photoCardRef}
+                onMouseMove={handlePhotoMouseMove}
+                onMouseLeave={handlePhotoMouseLeave}
+                className="relative -rotate-1 transition-transform will-change-transform hover:rotate-0"
+                style={{ transformStyle: 'preserve-3d' }}
+              >
+                <div
+                  className="absolute inset-0 translate-x-2.5 translate-y-2.5 rounded-[3px] bg-[#1C2B52] -z-10"
+                  aria-hidden="true"
+                />
+                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[3px] border-2 border-[#C9972E] bg-[#EDE8DC] shadow-sm">
+                  <img
+                    src="/images/hero.jpg"
+                    alt=""
+                    loading="eager"
+                    fetchPriority="high"
+                    className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${
+                      isPlaying && !isVideoError ? 'opacity-0' : 'opacity-100'
+                    }`}
+                    aria-hidden="true"
+                  />
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    loop
+                    playsInline
+                    muted
+                    preload="none"
+                    poster="/images/hero.jpg"
+                    className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${
+                      isPlaying && !isVideoError ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    aria-hidden="true"
+                    tabIndex={-1}
+                    onPlay={() => setIsPlaying(true)}
+                    onPause={() => setIsPlaying(false)}
+                  >
+                    <source ref={mp4SourceRef} type="video/mp4" />
+                    <source ref={webmSourceRef} type="video/webm" />
+                  </video>
+                  <div
+                    dir={isArabic ? 'rtl' : 'ltr'}
+                    className="absolute bottom-2 z-20 flex items-center gap-2"
+                    style={{ insetInlineEnd: '0.5rem' }}
+                  >
+                    {!isVideoError && isVideoRestricted && !isPlaying && (
+                        <button
+                          type="button"
+                          onClick={handleTogglePlayback}
+                          className="inline-flex min-h-10 items-center gap-2 rounded border border-[#C9972E] bg-[#101B3A]/80 px-3 py-2 text-xs font-semibold text-white shadow-sm backdrop-blur-sm transition-colors hover:bg-[#1C2B52] focus:outline-none focus:ring-2 focus:ring-[#E6BF63]"
+                          aria-label={playLabel}
+                        >
+                          <Play className="h-4 w-4 shrink-0" aria-hidden="true" />
+                          <span>{playLabel}</span>
+                        </button>
+                      )}
+                    {isVideoLoaded && !isVideoError && (!isVideoRestricted || isPlaying) && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={handleToggleSound}
+                          className="inline-flex min-h-10 items-center gap-2 rounded border border-[#C9972E] bg-[#101B3A]/80 px-3 py-2 text-xs font-semibold text-white shadow-sm backdrop-blur-sm transition-colors hover:bg-[#1C2B52] focus:outline-none focus:ring-2 focus:ring-[#E6BF63]"
+                          aria-label={soundLabel}
+                          aria-pressed={isSoundEnabled}
+                        >
+                          {isSoundEnabled
+                            ? <Volume2 className="h-4 w-4 shrink-0" aria-hidden="true" />
+                            : <VolumeX className="h-4 w-4 shrink-0" aria-hidden="true" />}
+                          <span>{soundLabel}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleTogglePlayback}
+                          className="inline-flex h-10 w-10 items-center justify-center rounded border border-[#C9972E]/80 bg-[#101B3A]/80 text-white shadow-sm backdrop-blur-sm transition-colors hover:bg-[#1C2B52] focus:outline-none focus:ring-2 focus:ring-[#E6BF63]"
+                          aria-label={isPlaying
+                            ? isArabic ? 'إيقاف الفيديو مؤقتًا' : 'Mettre la vidéo en pause'
+                            : playLabel}
+                        >
+                          {isPlaying
+                            ? <Pause className="h-4 w-4" aria-hidden="true" />
+                            : <Play className="h-4 w-4" aria-hidden="true" />}
+                        </button>
+                      </>
+                    )}
+                    {isVideoError && (
+                      <span role="status" className="rounded bg-[#101B3A]/85 px-3 py-2 text-xs text-white">
+                        {isArabic ? 'الفيديو غير متاح' : 'Vidéo indisponible'}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <p className="mt-2 text-center font-serif-brand text-xs italic text-[#4A5168]">
+                  {isArabic
                     ? 'صورة تذكارية من أنشطة الجمعية بأسفي'
-                    : 'Photo d’ensemble de l’association ou d’un spectacle à Asfi'
-                }
-              />
+                    : 'Photo d’ensemble de l’association ou d’un spectacle à Asfi'}
+                </p>
+              </div>
             </div>
           </div>
         </div>

@@ -75,7 +75,7 @@ export const Header: React.FC<HeaderProps> = ({
             <img
               src="/logo-white.svg"
               alt="Logo Association Univers Anim Asfi"
-              className={`w-auto object-contain transition-all duration-300 ${
+              className={`w-auto max-w-[42vw] object-contain transition-all duration-300 ${
                 isScrolled ? 'h-11 sm:h-12' : 'h-13 sm:h-15'
               }`}
             />
@@ -110,7 +110,7 @@ export const Header: React.FC<HeaderProps> = ({
           </nav>
 
           {/* Actions: FR | عربي Switcher + Magnetic Adhérer Button */}
-          <div className="flex items-center gap-4 shrink-0">
+          <div className="flex items-center gap-2 shrink-0 sm:gap-4">
             {/* Language Switcher */}
             <div className="flex items-center text-xs font-semibold tracking-wider border border-[#C9972E]/40 rounded-[4px] overflow-hidden bg-[#101B3A]">
               <button
@@ -144,7 +144,7 @@ export const Header: React.FC<HeaderProps> = ({
             <MagneticButton
               variant="primary"
               onClick={onOpenJoinModal}
-              className="hidden sm:inline-flex px-4 py-2"
+              className="!hidden px-4 py-2 lg:!inline-flex"
             >
               {tNav.joinBtn}
             </MagneticButton>

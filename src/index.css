@@ -78,18 +78,11 @@ body {
   opacity: 0.05;
 }
 
-/* Subtle clean scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--color-cream);
-}
-::-webkit-scrollbar-thumb {
-  background: #D8D1C1;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-gold);
+/* Keep scrolling available while hiding browser scrollbar tracks. */
+html {
+  scrollbar-width: none;
 }
 
+::-webkit-scrollbar {
+  display: none;
+}

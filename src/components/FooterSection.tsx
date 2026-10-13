@@ -106,7 +106,14 @@ export const FooterSection: React.FC<FooterSectionProps> = ({ currentLang }) => 
 
         {/* Bottom Bar: Copyright & Scroll to top */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#F8F5EE]/70">
-          <div>© 2026 Univers Anim. Tous droits réservés.</div>
+          <div className="text-center sm:text-left">
+            <div>© 2026 Univers Anim. Tous droits réservés.</div>
+            <div className="mt-1 text-[#E6BF63]">
+              {currentLang === 'ar'
+                ? 'تطوير الموقع: Oumaima Ait Said'
+                : 'Développement du site : Oumaima Ait Said'}
+            </div>
+          </div>
           <button
             type="button"
             onClick={scrollToTop}
