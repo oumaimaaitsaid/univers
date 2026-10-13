@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 280" fill="none">
+  <defs>
+    <linearGradient id="emblemGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E8C773" />
+      <stop offset="40%" stop-color="#C9972E" />
+      <stop offset="75%" stop-color="#F3DC9B" />
+      <stop offset="100%" stop-color="#AA7818" />
+    </linearGradient>
+    <linearGradient id="emblemNavy" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1C2B52" />
+      <stop offset="100%" stop-color="#0F1B3D" />
+    </linearGradient>
+  </defs>
+
+  <!-- Laurel Wreath -->
+  <g transform="translate(140, 140)">
+    <!-- Branch Left -->
+    <path d="M-15 95 C-65 85 -105 45 -105 -10 C-105 -55 -75 -95 -25 -120" fill="none" stroke="url(#emblemGold)" stroke-width="3.8" stroke-linecap="round" />
+    <!-- Left Leaves -->
+    <g fill="url(#emblemGold)">
+      <path d="M-25 92 C-38 102 -50 98 -45 86 C-40 78 -28 82 -25 92 Z" />
+      <path d="M-50 78 C-70 86 -78 78 -70 66 C-62 62 -54 70 -50 78 Z" />
+      <path d="M-75 58 C-95 62 -98 50 -86 42 C-78 42 -74 50 -75 58 Z" />
+      <path d="M-90 30 C-110 30 -110 18 -96 14 C-88 16 -88 24 -90 30 Z" />
+      <path d="M-100 -2 C-116 -6 -115 -18 -100 -20 C-92 -16 -94 -8 -100 -2 Z" />
+      <path d="M-96 -34 C-110 -42 -106 -54 -92 -54 C-86 -46 -90 -38 -96 -34 Z" />
+      <path d="M-82 -68 C-94 -80 -86 -92 -74 -88 C-70 -80 -74 -72 -82 -68 Z" />
+      <path d="M-58 -96 C-68 -108 -58 -120 -46 -114 C-46 -104 -50 -98 -58 -96 Z" />
+      <path d="M-32 -118 C-38 -132 -26 -138 -16 -130 C-18 -122 -24 -118 -32 -118 Z" />
+    </g>
+
+    <!-- Branch Right -->
+    <path d="M15 95 C65 85 105 45 105 -10 C105 -55 75 -95 25 -120" fill="none" stroke="url(#emblemGold)" stroke-width="3.8" stroke-linecap="round" />
+    <!-- Right Leaves -->
+    <g fill="url(#emblemGold)">
+      <path d="M25 92 C38 102 50 98 45 86 C40 78 28 82 25 92 Z" />
+      <path d="M50 78 C70 86 78 78 70 66 C62 62 54 70 50 78 Z" />
+      <path d="M75 58 C95 62 98 50 86 42 C78 42 74 50 75 58 Z" />
+      <path d="M90 30 C110 30 110 18 96 14 C88 16 88 24 90 30 Z" />
+      <path d="M100 -2 C116 -6 115 -18 100 -20 C92 -16 94 -8 100 -2 Z" />
+      <path d="M96 -34 C110 -42 106 -54 92 -54 C86 -46 90 -38 96 -34 Z" />
+      <path d="M82 -68 C94 -80 86 -92 74 -88 C70 -80 74 -72 82 -68 Z" />
+      <path d="M58 -96 C68 -108 58 -120 46 -114 C46 -104 50 -98 58 -96 Z" />
+      <path d="M32 -118 C38 -132 26 -138 16 -130 C18 -122 24 -118 32 -118 Z" />
+    </g>
+
+    <!-- Bottom tie knot and ribbon -->
+    <circle cx="0" cy="96" r="5" fill="url(#emblemGold)" />
+    <path d="M-12 99 C-4 103 4 103 12 99" fill="none" stroke="url(#emblemGold)" stroke-width="3" stroke-linecap="round" />
+  </g>
+
+  <!-- 5-Point Navy Star with Double Gold Border -->
+  <g transform="translate(140, 132)">
+    <polygon points="0,-82 20,-24 82,-24 32,12 50,72 0,36 -50,72 -32,12 -82,-24 -20,-24" fill="url(#emblemGold)" />
+    <polygon points="0,-74 18,-22 74,-22 28,11 45,65 0,32 -45,65 -28,11 -74,-22 -18,-22" fill="url(#emblemNavy)" stroke="url(#emblemGold)" stroke-width="2" />
+
+    <!-- Stylized Gold "X" inside the Star -->
+    <g transform="translate(0, -5)">
+      <path d="M-13 -20 L-6 -20 C-3 -10 -3 -5 -10 0 C-3 5 -3 10 -6 20 L-13 20 C-10 10 -10 5 -15 0 C-10 -5 -10 -10 -13 -20 Z" fill="url(#emblemGold)" />
+      <path d="M13 -20 L6 -20 C3 -10 3 -5 10 0 C3 5 3 10 6 20 L13 20 C10 10 10 5 15 0 C10 -5 10 -10 13 -20 Z" fill="url(#emblemGold)" />
+    </g>
+  </g>
+</svg>

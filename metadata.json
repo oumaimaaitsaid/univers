@@ -1,0 +1,6 @@
+{
+  "name": "Univers Anim - Association Culturelle Asfi",
+  "description": "Site officiel de l'association Univers Anim à Asfi, Maroc. Animation, culture, solidarité : musique, théâtre, ateliers jeunesse et festivals.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

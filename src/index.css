@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+:root {
+  /* Brand Color System */
+  --color-navy: #1C2B52;
+  --color-navy-deep: #101B3A;
+  --color-gold: #C9972E;
+  --color-gold-light: #E6BF63;
+  --color-cream: #F8F5EE;
+  --color-cream-card: #F2EDE2;
+  --color-white: #FFFFFF;
+  --color-text-grey: #4A5168;
+  --color-border-subtle: rgba(28, 43, 82, 0.12);
+
+  /* Typography */
+  --font-serif: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Inter', sans-serif;
+  --font-arabic: 'Cairo', 'Tajawal', sans-serif;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-navy);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+.font-serif-brand {
+  font-family: var(--font-serif);
+}
+
+.font-sans-brand {
+  font-family: var(--font-sans);
+}
+
+.font-arabic-brand {
+  font-family: var(--font-arabic);
+}
+
+/* Print-like Framed Photo Placeholder */
+.photo-frame {
+  background-color: #EDE8DC;
+  border: 1px solid rgba(28, 43, 82, 0.16);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-frame-offset {
+  position: relative;
+}
+
+.photo-frame-offset::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: -8px;
+  bottom: -8px;
+  background-color: var(--color-navy);
+  z-index: 0;
+  border-radius: 2px;
+}
+
+[dir="rtl"] .photo-frame-offset::before {
+  left: -8px;
+  right: 8px;
+}
+
+/* Subtle Laurel Watermark */
+.bg-laurel-watermark {
+  background-image: url('/favicon.svg');
+  background-repeat: no-repeat;
+  background-position: right -40px center;
+  background-size: 420px;
+  opacity: 0.05;
+}
+
+/* Subtle clean scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-cream);
+}
+::-webkit-scrollbar-thumb {
+  background: #D8D1C1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold);
+}
+
