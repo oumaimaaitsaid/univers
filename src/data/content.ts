@@ -507,8 +507,8 @@ export const GALLERY_SPECS: GalleryItemSpec[] = [
   {
     id: 'g-2',
     fileName: '/images/galerie-2.jpg',
-    formatLabel: 'PHOTO À AJOUTER (format 16:9)',
-    aspectRatio: 'aspect-[16/9]',
+    formatLabel: 'PHOTO À AJOUTER (format 4:3)',
+    aspectRatio: 'aspect-[4/3]',
     captionFr: 'Répétition musicale et chants collectifs',
     captionAr: 'تداريب موسيقية وأداء جماعي',
   },
@@ -523,8 +523,8 @@ export const GALLERY_SPECS: GalleryItemSpec[] = [
   {
     id: 'g-4',
     fileName: '/images/galerie-4.jpg',
-    formatLabel: 'PHOTO À AJOUTER (format 1:1)',
-    aspectRatio: 'aspect-square',
+    formatLabel: 'PHOTO À AJOUTER (format 4:3)',
+    aspectRatio: 'aspect-[4/3]',
     captionFr: 'Sortie citoyenne et animation de plein air',
     captionAr: 'نشاط تربوي وتنشيطي في الهواء الطلق',
     hasOffsetNavy: true,
@@ -540,8 +540,8 @@ export const GALLERY_SPECS: GalleryItemSpec[] = [
   {
     id: 'g-6',
     fileName: '/images/galerie-6.jpg',
-    formatLabel: 'PHOTO À AJOUTER (format 16:9)',
-    aspectRatio: 'aspect-[16/9]',
+    formatLabel: 'PHOTO À AJOUTER (format 4:3)',
+    aspectRatio: 'aspect-[4/3]',
     captionFr: 'Rencontre annuelle et clôture d’activité',
     captionAr: 'اختتام الموسم التنشيطي والاحتفاء بالناشئة',
   },
